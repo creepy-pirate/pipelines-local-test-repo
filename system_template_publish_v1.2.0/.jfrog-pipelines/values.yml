@@ -13,3 +13,4 @@ publishTemplate:
   jfrogAccessTokenIntegration: jf_token
   templateRepositoryResourceName: Publish_Template_kunal_r1
   templateUploadStatusResourceName: Publish_Template_kunal_r2
+  allowOverride: true
