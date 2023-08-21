@@ -67,7 +67,10 @@ pipelines:
             - cd $res_signed_git_resourcePath
             - echo "Content for artifact 1" > artifact1.txt
             - jfrog rt upload artifact1.txt km-generic-local
+            - jfrog rt build-collect-env $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
+            - jfrog rt build-add-git $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
             - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
+            - jfrog rt bp $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER --filter=km-generic-local=km-generic-local
             - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
             - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
@@ -84,9 +87,12 @@ pipelines:
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
-            - touch server.js
-            - jfrog rt upload server.js km-generic-local
+            - echo "Content for artifact 2" > artifact2.txt
+            - jfrog rt upload artifact2.txt km-generic-local
+            - jfrog rt build-collect-env $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
+            - jfrog rt build-add-git $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
             - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
+            - jfrog rt bp $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER --filter=km-generic-local=km-generic-local
             - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
             - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
