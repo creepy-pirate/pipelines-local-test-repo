@@ -84,8 +84,8 @@ pipelines:
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
-            - echo "Content for artifact 2" > artifact2.txt
-            - jfrog rt upload artifact2.txt km-generic-local
+            - touch server.js
+            - jfrog rt upload server.js km-generic-local
             - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
             - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
