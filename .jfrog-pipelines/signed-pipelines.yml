@@ -1,3 +1,39 @@
+# resources:
+#   - name: signed_git
+#     type: GitRepo
+#     configuration:
+#       gitProvider: deepak_git
+#       path: creepy-pirate/pipelines-local-test-repo
+#       branches:
+#         include: {{ gitBranch }}
+#   - name: signed_buildinfo_1
+#     type: BuildInfo
+#     configuration:
+#       sourceArtifactory: int_default_artifactory
+ 
+# pipelines:
+#   - name: test_signed_start_1
+#     configuration:
+#       jfrogCliVersion: 2
+#     steps:
+#       - name: create_with_buildinfo
+#         type: Bash
+#         configuration:
+#           inputResources:
+#             - name: signed_git
+#           integrations:
+#             - name: int_default_artifactory
+#           outputResources:
+#             - name: signed_buildinfo_1
+#         execution:
+#           onExecute:
+#             - cd $res_signed_git_resourcePath
+#             - touch server.js
+#             - jfrog rt upload server.js km-generic-local
+#             - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
+#             - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
+#             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
+#             - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
 resources:
   - name: signed_git
     type: GitRepo
@@ -5,18 +41,19 @@ resources:
       gitProvider: deepak_git
       path: creepy-pirate/pipelines-local-test-repo
       branches:
-        include: {{ gitBranch }}
+        include: "{{ gitBranch }}"
+
   - name: signed_buildinfo_1
     type: BuildInfo
     configuration:
       sourceArtifactory: int_default_artifactory
- 
+
 pipelines:
   - name: test_signed_start_1
     configuration:
       jfrogCliVersion: 2
     steps:
-      - name: create_with_buildinfo
+      - name: create_artifact_1
         type: Bash
         configuration:
           inputResources:
@@ -28,10 +65,30 @@ pipelines:
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
-            - touch server.js
-            - jfrog rt upload server.js km-generic-local
+            - echo "Content for artifact 1" > artifact1.txt
+            - jfrog rt upload artifact1.txt km-generic-local
             - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
             - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
             - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
+
+      - name: create_artifact_2
+        type: Bash
+        configuration:
+          inputResources:
+            - name: signed_git
+          integrations:
+            - name: int_default_artifactory
+          outputResources:
+            - name: signed_buildinfo_1
+        execution:
+          onExecute:
+            - cd $res_signed_git_resourcePath
+            - echo "Content for artifact 2" > artifact2.txt
+            - jfrog rt upload artifact2.txt km-generic-local
+            - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
+            - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
+            - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
+            - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
+
 
