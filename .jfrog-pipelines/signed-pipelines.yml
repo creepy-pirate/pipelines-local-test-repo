@@ -1,39 +1,3 @@
-# resources:
-#   - name: signed_git
-#     type: GitRepo
-#     configuration:
-#       gitProvider: deepak_git
-#       path: creepy-pirate/pipelines-local-test-repo
-#       branches:
-#         include: {{ gitBranch }}
-#   - name: signed_buildinfo_1
-#     type: BuildInfo
-#     configuration:
-#       sourceArtifactory: int_default_artifactory
- 
-# pipelines:
-#   - name: test_signed_start_1
-#     configuration:
-#       jfrogCliVersion: 2
-#     steps:
-#       - name: create_with_buildinfo
-#         type: Bash
-#         configuration:
-#           inputResources:
-#             - name: signed_git
-#           integrations:
-#             - name: int_default_artifactory
-#           outputResources:
-#             - name: signed_buildinfo_1
-#         execution:
-#           onExecute:
-#             - cd $res_signed_git_resourcePath
-#             - touch server.js
-#             - jfrog rt upload server.js km-generic-local
-#             - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
-#             - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
-#             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
-#             - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
 resources:
   - name: signed_git
     type: GitRepo
@@ -53,7 +17,7 @@ pipelines:
     configuration:
       jfrogCliVersion: 2
     steps:
-      - name: create_artifact_1
+      - name: create_with_buildinfo
         type: Bash
         configuration:
           inputResources:
@@ -65,76 +29,49 @@ pipelines:
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
-            - echo "Content for artifact 1" > artifact1.txt
-            - jfrog rt upload artifact1.txt km-generic-local
-            - jfrog rt build-collect-env $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
-            - jfrog rt build-add-git $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
-            - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
-            - jfrog rt bp $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER --filter=km-generic-local=km-generic-local
-            - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
+            - 'touch server_${run_id}.js'
+            - >-
+              jfrog rt upload server_${run_id}.js km-generic-local --build-name
+              $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
+            - 'touch dependency_${run_id}.js'
+            - >-
+              jfrog rt upload dependency_${run_id}.js km-generic-local --build-name
+              $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
+            - >-
+              jf rt bad $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
+              "km-generic-local/dependency_${run_id}.js" --from-rt
+            - jf rt bce $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
+            - >-
+              jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME
+              $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
             - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
 
-      name: test_signed_start_1
-configuration:
-  jfrogCliVersion: 2
-steps:
-  - name: create_with_buildinfo
-    type: Bash
-    configuration:
-      inputResources:
-        - name: signed_git
-      integrations:
-        - name: int_default_artifactory
-      outputResources:
-        - name: signed_buildinfo_1
-    execution:
-      onExecute:
-        - cd $res_signed_git_resourcePath
-        - 'touch server_${run_id}.js'
-        - >-
-          jfrog rt upload server_${run_id}.js km-generic-local --build-name
-          $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
-        - 'touch dependency_${run_id}.js'
-        - >-
-          jfrog rt upload dependency_${run_id}.js km-generic-local --build-name
-          $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
-        - >-
-          jf rt bad $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
-          "km-generic-local/dependency_${run_id}.js" --from-rt
-        - jf rt bce $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
-        - >-
-          jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME
-          $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
-        - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
-        - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
-        
-  - name: create_with_buildinfo_matrix
-    type: Matrix
-    stepletMultipliers:
-      environmentVariables:
-        - id: 1
-        - id: 2
-    configuration:
-      inputSteps:
-        - name: create_with_buildinfo
-      inputResources:
-        - name: signed_git
-      integrations:
-        - name: int_default_artifactory
-      outputResources:
-        - name: signed_buildinfo_1
-    execution:
-      onExecute:
-        - cd $res_signed_git_resourcePath
-        - 'touch server_${steplet_id}.js'
-        - 'jfrog rt upload server_${steplet_id}.js km-generic-local'
-        - >-
-          jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME
-          $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
-        - >-
-          save_artifact_info 'buildInfo' './summaryOutput.json' --build-name
-          $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
-        - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
-        - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
-
+      - name: create_with_buildinfo_matrix
+        type: Matrix
+        stepletMultipliers:
+          environmentVariables:
+            - id: 1
+            - id: 2
+        configuration:
+          inputSteps:
+            - name: create_with_buildinfo
+          inputResources:
+            - name: signed_git
+          integrations:
+            - name: int_default_artifactory
+          outputResources:
+            - name: signed_buildinfo_1
+        execution:
+          onExecute:
+            - cd $res_signed_git_resourcePath
+            - 'touch server_${steplet_id}.js'
+            - 'jfrog rt upload server_${steplet_id}.js km-generic-local'
+            - >-
+              jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME
+              $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
+            - >-
+              save_artifact_info 'buildInfo' './summaryOutput.json' --build-name
+              $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
+            - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
+            - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
