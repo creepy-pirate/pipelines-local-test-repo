@@ -7,11 +7,6 @@ resources:
       branches:
         include: "{{ gitBranch }}"
 
-  - name: signed_buildinfo_1
-    type: BuildInfo
-    configuration:
-      sourceArtifactory: int_default_artifactory
-
 pipelines:
   - name: test_signed_start_1
     configuration:
@@ -21,11 +16,11 @@ pipelines:
         type: Bash
         configuration:
           inputResources:
-            - name: signedd_git
+            - name: signed_git
           integrations:
             - name: int_default_artifactory
           outputResources:
-            - name: signed_buildinfo_1
+            - name: signed_buildinfo_1  # Keep this reference
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
@@ -61,7 +56,7 @@ pipelines:
           integrations:
             - name: int_default_artifactory
           outputResources:
-            - name: signed_buildinfo_1
+            - name: signed_buildinfo_1  # Keep this reference
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
