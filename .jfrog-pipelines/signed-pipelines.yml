@@ -1,5 +1,5 @@
 resources:
-  - name: signed_git
+  - name: signedd_git
     type: GitRepo
     configuration:
       gitProvider: deepak_git
