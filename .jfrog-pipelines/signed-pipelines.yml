@@ -1,14 +1,18 @@
 resources:
-  - name: signedd_git
+  - name: signed_git
     type: GitRepo
     configuration:
       gitProvider: deepak_git
       path: creepy-pirate/pipelines-local-test-repo
       branches:
-        include: "{{ gitBranch }}"
-
+        include: {{ gitBranch }}
+  - name: signed_buildinfo_1
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: int_default_artifactory
+ 
 pipelines:
-  - name: test_signed_start_heheh
+  - name: test_signed_start_1
     configuration:
       jfrogCliVersion: 2
     steps:
@@ -20,28 +24,21 @@ pipelines:
           integrations:
             - name: int_default_artifactory
           outputResources:
-            - name: signed_buildinfo_1  # Keep this reference
+            - name: signed_buildinfo_1
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
-            - 'touch server_${run_id}.js'
-            - >-
-              jfrog rt upload server_${run_id}.js km-generic-local --build-name
-              $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
-            - 'touch dependency_${run_id}.js'
-            - >-
-              jfrog rt upload dependency_${run_id}.js km-generic-local --build-name
-              $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
-            - >-
-              jf rt bad $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
-              "km-generic-local/dependency_${run_id}.js" --from-rt
+            - touch server_${run_id}.js
+            - jfrog rt upload server_${run_id}.js km-generic-local --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
+            - touch dependency_${run_id}.js
+            - jfrog rt upload dependency_${run_id}.js km-generic-local --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
+            - jf rt bad $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER "km-generic-local/dependency_${run_id}.js" --from-rt
             - jf rt bce $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER
-            - >-
-              jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME
-              $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
+            - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json            
+            # - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
             - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
-
+      
       - name: create_with_buildinfo_matrix
         type: Matrix
         stepletMultipliers:
@@ -50,23 +47,20 @@ pipelines:
             - id: 2
         configuration:
           inputSteps:
-            - name: create_with_buildinfo
+            - name: create_with_buildinfo          
           inputResources:
             - name: signed_git
           integrations:
             - name: int_default_artifactory
           outputResources:
-            - name: signed_buildinfo_1  # Keep this reference
+            - name: signed_buildinfo_1
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
-            - 'touch server_${steplet_id}.js'
-            - 'jfrog rt upload server_${steplet_id}.js km-generic-local'
-            - >-
-              jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME
-              $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
-            - >-
-              save_artifact_info 'buildInfo' './summaryOutput.json' --build-name
-              $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
+            - touch server_${steplet_id}.js
+            - jfrog rt upload server_${steplet_id}.js km-generic-local
+            - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
+            - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
             - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
+      
