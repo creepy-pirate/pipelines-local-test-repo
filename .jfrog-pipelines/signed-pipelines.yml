@@ -10,6 +10,14 @@ resources:
     type: BuildInfo
     configuration:
       sourceArtifactory: int_default_artifactory
+  - name: signed_buildinfo_2
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: int_default_artifacto
+  - name: signed_buildinfo_3
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: int_default_artifact
 
 pipelines:
   - name: test_signed_start
@@ -52,9 +60,9 @@ pipelines:
           inputResources:
             - name: signed_git
           integrations:
-            - name: int_default_artifactory
+            - name: int_default_artifacto
           outputResources:
-            - name: signed_buildinfo_1  # Keep this reference
+            - name: signed_buildinfo_2  # Keep this reference
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
@@ -85,9 +93,9 @@ pipelines:
           inputResources:
             - name: signed_git
           integrations:
-            - name: int_default_artifactory
+            - name: int_default_artifact
           outputResources:
-            - name: signed_buildinfo_1  # Keep this reference
+            - name: signed_buildinfo_3  # Keep this reference
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
