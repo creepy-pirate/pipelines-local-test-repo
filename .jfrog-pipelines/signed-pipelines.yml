@@ -110,8 +110,8 @@ pipelines:
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
-            - touch server.js
-            - jfrog rt upload server.js km-generic-local
+            - touch arti.js
+            - jfrog rt upload arti.js km-generic-local
             - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
             - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
@@ -163,8 +163,8 @@ pipelines:
                 mkdir "modules_${steplet_id}_$i";
                 touch "modules_${steplet_id}_$i/module_file_$i.txt";
               done
-            - jfrog rt upload artifacts_${steplet_id}_* my-generic-local/
-            - jfrog rt upload modules_${steplet_id}_* my-generic-local/
+            - jfrog rt upload "artifacts_${steplet_id}_*" "my-generic-local/${JFROG_CLI_BUILD_NAME}/artifacts/${JFROG_CLI_BUILD_NUMBER}/"
+            - jfrog rt upload "modules_${steplet_id}_*" "my-generic-local/${JFROG_CLI_BUILD_NAME}/modules/${JFROG_CLI_BUILD_NUMBER}/"
             - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
             - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
