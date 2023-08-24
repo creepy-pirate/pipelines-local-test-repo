@@ -62,6 +62,27 @@ pipelines:
             - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
             - write_output signed_buildinfo_3 "buildName=$JFROG_CLI_BUILD_NAME"
             - write_output signed_buildinfo_3 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
+      - name: create_with_buildinfo
+        type: Bash
+        configuration:
+          inputResources:
+            - name: signed_git
+          integrations:
+            - name: int_default_artifactory
+          outputResources:
+            - name: signed_buildinfo_1
+        execution:
+          onExecute:
+            - cd $res_signed_git_resourcePath
+            - touch server.js
+            - echo "console.log('Hello, world!');" > server.js
+            - jfrog rt upload server.js km-generic-local
+            - jfrog rt u "generic-local/server.js" "generic-local/server_copy.js"
+            - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
+            - jfrog rt bp $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER --filter=generic-local=km-generic-local;generic-local=km-generic-local
+            - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
+            - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
+            - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
 
       - name: create_with_buildinfo_matrix
         type: Matrix
