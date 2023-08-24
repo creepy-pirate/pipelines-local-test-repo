@@ -6,6 +6,10 @@ resources:
       path: creepy-pirate/pipelines-local-test-repo
       branches:
         include: "{{ gitBranch }}"
+  - name: signed_buildinfo_1
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: int_default_artifactory
 
 pipelines:
   - name: test_signed_start_heheh
