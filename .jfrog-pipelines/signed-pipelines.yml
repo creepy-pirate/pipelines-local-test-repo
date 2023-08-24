@@ -12,7 +12,7 @@ resources:
       sourceArtifactory: int_default_artifactory
 
 pipelines:
-  - name: test_signed_start_heheh
+  - name: test_signed_start
     configuration:
       jfrogCliVersion: 2
     steps:
