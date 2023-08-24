@@ -106,7 +106,7 @@ pipelines:
           integrations:
             - name: int_default_artifactory
           outputResources:
-            - name: signed_buildinfo_1
+            - name: signed_buildinfo_2
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
@@ -125,7 +125,7 @@ pipelines:
           integrations:
             - name: int_default_artifactory
           outputResources:
-            - name: signed_buildinfo_1
+            - name: signed_buildinfo_3
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
@@ -163,8 +163,8 @@ pipelines:
                 mkdir "modules_${steplet_id}_$i";
                 touch "modules_${steplet_id}_$i/module_file_$i.txt";
               done
-            - jfrog rt upload "artifacts_${steplet_id}_*" "my-generic-local/${JFROG_CLI_BUILD_NAME}/artifacts/${JFROG_CLI_BUILD_NUMBER}/"
-            - jfrog rt upload "modules_${steplet_id}_*" "my-generic-local/${JFROG_CLI_BUILD_NAME}/modules/${JFROG_CLI_BUILD_NUMBER}/"
+            - jfrog rt upload "artifacts_${steplet_id}_*" my-generic-local
+            - jfrog rt upload "modules_${steplet_id}_*" my-generic-local
             - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
             - save_artifact_info 'buildInfo' './summaryOutput.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
