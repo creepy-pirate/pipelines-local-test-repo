@@ -92,14 +92,14 @@ resources:
     type: BuildInfo
     configuration:
       sourceArtifactory: int_default_artifactory
-- name: signed_buildinfo_2
+  - name: signed_buildinfo_2
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: int_default_artifactory
+  - name: signed_buildinfo_3
     type: BuildInfo
     configuration:
       sourceArtifactory: int_default_artifactoryy
-- name: signed_buildinfo_3
-    type: BuildInfo
-    configuration:
-      sourceArtifactory: int_default_artifactoryyy
 
 pipelines:
   - name: test_signed_start_1
