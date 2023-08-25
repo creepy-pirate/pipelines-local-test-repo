@@ -54,33 +54,6 @@ pipelines:
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
             - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
 
-      - name: generate_additional_artifacts_and_dependencies
-        type: Bash
-        configuration:
-          inputResources:
-            - name: signed_git
-          integrations:
-            - name: int_default_artifacto
-          outputResources:
-            - name: signed_buildinfo_2  # Keep this reference
-        execution:
-          onExecute:
-            - cd $res_signed_git_resourcePath
-            - 'touch additional_artifact_1.txt'
-            - 'touch additional_artifact_2.txt'
-            - 'touch additional_artifact_3.txt'
-            - 'touch additional_dependency_1.txt'
-            - 'touch additional_dependency_2.txt'
-            - jfrog rt upload additional_artifact_1.txt km-generic-local
-            - jfrog rt upload additional_artifact_2.txt km-generic-local
-            - jfrog rt upload additional_artifact_3.txt km-generic-local
-            - jfrog rt upload additional_dependency_1.txt km-generic-local
-            - jfrog rt upload additional_dependency_2.txt km-generic-local
-            - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME
-              $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
-            - write_output signed_buildinfo_2 "buildName=$JFROG_CLI_BUILD_NAME"
-            - write_output signed_buildinfo_2 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
-
 
 
 # resources:
