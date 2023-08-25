@@ -83,8 +83,8 @@ pipelines:
             - jfrog rt upload "modules_${steplet_id}_*" my-generic-local
             - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summary.json
             - save_artifact_info 'buildInfo' './summary.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
-            - write_output signed_buildinfo_2 "buildName=$JFROG_CLI_BUILD_NAME"
-            - write_output signed_buildinfo_2 "buildNumber=$JFROG_CLI_BUILD_NUMBER
+            - write_output signed_buildinfo_3 "buildName=$JFROG_CLI_BUILD_NAME"
+            - write_output signed_buildinfo_3 "buildNumber=$JFROG_CLI_BUILD_NUMBER
 
 
 
