@@ -53,6 +53,39 @@ pipelines:
               $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
             - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
             - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
+      - name: create_with_buildinfo_matrix
+        type: Matrix
+        stepletMultipliers:
+          environmentVariables:
+            - id: 1
+            - id: 2
+        configuration:
+          inputSteps:
+            - name: create_with_buildinfo
+            - name: build_new  
+          inputResources:
+            - name: signed_git
+          integrations:
+            - name: int_default_artifact
+          outputResources:
+            - name: signed_buildinfo_3
+        execution:
+          onExecute:
+            - cd $res_signed_git_resourcePath
+            - for i in {1..5}; do
+                mkdir "artifacts_${steplet_id}_$i";
+                touch "artifacts_${steplet_id}_$i/artifact_file_$i.txt";
+              done
+            - for i in {1..3}; do
+                mkdir "modules_${steplet_id}_$i";
+                touch "modules_${steplet_id}_$i/module_file_$i.txt";
+              done
+            - jfrog rt upload "artifacts_${steplet_id}_*" my-generic-local
+            - jfrog rt upload "modules_${steplet_id}_*" my-generic-local
+            - jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME $JFROG_CLI_BUILD_NUMBER > summary.json
+            - save_artifact_info 'buildInfo' './summary.json' --build-name $JFROG_CLI_BUILD_NAME --build-number $JFROG_CLI_BUILD_NUMBER
+            - write_output signed_buildinfo_2 "buildName=$JFROG_CLI_BUILD_NAME"
+            - write_output signed_buildinfo_2 "buildNumber=$JFROG_CLI_BUILD_NUMBER
 
 
 
