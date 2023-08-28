@@ -57,7 +57,7 @@ pipelines:
           integrations:
             - name: int_default_artifactory
           outputResources:
-            - name: signed_buildinfo_3
+            - name: signed_buildinfo_1
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
