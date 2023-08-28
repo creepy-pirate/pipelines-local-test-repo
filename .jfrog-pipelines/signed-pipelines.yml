@@ -10,14 +10,6 @@ resources:
     type: BuildInfo
     configuration:
       sourceArtifactory: int_default_artifactory
-  - name: signed_buildinfo_2
-    type: BuildInfo
-    configuration:
-      sourceArtifactory: int_default_artifacto
-  - name: signed_buildinfo_3
-    type: BuildInfo
-    configuration:
-      sourceArtifactory: int_default_artifact
 
 pipelines:
   - name: test_signed_start
@@ -63,7 +55,7 @@ pipelines:
           inputResources:
             - name: signed_git
           integrations:
-            - name: int_default_artifact
+            - name: int_default_artifactory
           outputResources:
             - name: signed_buildinfo_3
         execution:
