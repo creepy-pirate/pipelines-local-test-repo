@@ -21,7 +21,6 @@ pipelines:
         configuration:
           inputResources:
             - name: signed_git
-            - name: signed_buildinfo_1
           integrations:
             - name: int_default_artifactory
           outputResources:
