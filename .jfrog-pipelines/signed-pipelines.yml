@@ -23,8 +23,8 @@ pipelines:
             - name: signed_git
           integrations:
             - name: int_default_artifactory
-          # outputResources:
-          #   - name: signed_buildinfo_1  # Keep this reference
+          outputResources:
+            - name: signed_buildinfo_1  # Keep this reference
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
@@ -43,8 +43,8 @@ pipelines:
             - >-
               jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME
               $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
-            # - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
-            # - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
+            - write_output signed_buildinfo_1 "buildName=$JFROG_CLI_BUILD_NAME"
+            - write_output signed_buildinfo_1 "buildNumber=$JFROG_CLI_BUILD_NUMBER"
 
 
 
