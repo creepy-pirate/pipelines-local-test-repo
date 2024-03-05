@@ -21,10 +21,11 @@ pipelines:
         configuration:
           inputResources:
             - name: signed_git
+            - name: signed_buildinfo_1
           integrations:
             - name: int_default_artifactory
-          outputResources:
-            - name: signed_buildinfo_1  # Keep this reference
+          # outputResources:
+          #   - name: signed_buildinfo_1  # Keep this reference
         execution:
           onExecute:
             - cd $res_signed_git_resourcePath
