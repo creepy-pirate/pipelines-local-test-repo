@@ -44,8 +44,8 @@ pipelines:
             - >-
               jfrog rt build-publish --detailed-summary $JFROG_CLI_BUILD_NAME
               $JFROG_CLI_BUILD_NUMBER > summaryOutput.json
-            - write_output signed_buildinfo_1 "buildName="
-            - write_output signed_buildinfo_1 "buildNumber="
+            # - write_output signed_buildinfo_1 "buildName="
+            # - write_output signed_buildinfo_1 "buildNumber="
 
 
 
